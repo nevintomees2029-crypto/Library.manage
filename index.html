@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libra — Library Management</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-icon">L</span><div><strong>libra</strong><small>LIBRARY SYSTEM</small></div></div>
+    <div class="nav-label">WORKSPACE</div>
+    <button class="nav-item active" data-view="dashboard"><span>▦</span> Overview</button>
+    <button class="nav-item" data-view="catalog"><span>▤</span> Book catalog</button>
+    <button class="nav-item" data-view="requests"><span>↗</span> Waiting list <b id="navQueueCount">0</b></button>
+    <button class="nav-item" data-view="returns"><span>↶</span> Recent returns</button>
+    <div class="sidebar-bottom"><div class="avatar">LM</div><div><strong>Library Manager</strong><small>Local demo workspace</small></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="eyebrow">LIBRARY WORKSPACE / <span id="crumb">OVERVIEW</span></div><h1 id="pageTitle">Good afternoon 👋</h1><p class="subhead">Here’s what’s happening in your library today.</p></div>
+      <button class="primary" id="addTopBtn">＋ Add a book</button>
+    </header>
+
+    <section id="dashboardView" class="view">
+      <div class="stats">
+        <article class="stat-card"><div class="stat-top"><span>Total titles</span><span class="stat-icon violet">▤</span></div><strong id="totalBooks">0</strong><small>Unique books in catalog</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Available copies</span><span class="stat-icon green">✓</span></div><strong id="availableBooks">0</strong><small>Ready to be borrowed</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Waiting requests</span><span class="stat-icon orange">↗</span></div><strong id="waitingBooks">0</strong><small>Students in queue</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Recent returns</span><span class="stat-icon blue">↶</span></div><strong id="returnedBooks">0</strong><small>Latest returned copies</small></article>
+      </div>
+      <div class="content-grid">
+        <section class="panel wide">
+          <div class="panel-heading"><div><h2>Book catalog</h2><p>Manage titles and availability</p></div><button class="text-button" data-goto="catalog">View catalog →</button></div>
+          <div class="search-wrap"><span>⌕</span><input id="dashboardSearch" placeholder="Search by title, author or ISBN…"></div>
+          <div class="table-wrap"><table><thead><tr><th>BOOK</th><th>ISBN</th><th>SUBJECT</th><th>STATUS</th><th></th></tr></thead><tbody id="dashboardTable"></tbody></table></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Waiting list</h2><p>First requested, first served</p></div><span class="pill orange-pill" id="queuePill">0 waiting</span></div>
+          <div id="queuePreview" class="queue-list"></div>
+          <button class="secondary full" data-goto="requests">Manage requests</button>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Recently returned</h2><p>Last returned books</p></div><span class="pill blue-pill">Stack · LIFO</span></div>
+          <div id="returnPreview" class="return-list"></div>
+          <button class="secondary full" data-goto="returns">View return history</button>
+        </section>
+        <section class="panel wide accent-panel">
+          <div class="panel-heading"><div><h2>Subject explorer</h2><p>Browse books by topic</p></div><span class="pill violet-pill">Binary Search Tree concept</span></div>
+          <div id="subjectChips" class="chips"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="catalogView" class="view hidden">
+      <section class="panel">
+        <div class="panel-heading"><div><h2>All books</h2><p>Search, issue, return or remove catalog entries.</p></div><button class="primary" id="addCatalogBtn">＋ Add a book</button></div>
+        <div class="toolbar"><div class="search-wrap grow"><span>⌕</span><input id="catalogSearch" placeholder="Search title, author, ISBN or subject…"></div><select id="statusFilter"><option value="all">All statuses</option><option value="available">Available</option><option value="issued">All copies issued</option></select></div>
+        <div class="table-wrap"><table><thead><tr><th>BOOK</th><th>ISBN</th><th>SUBJECT</th><th>AVAILABILITY</th><th>ACTIONS</th></tr></thead><tbody id="catalogTable"></tbody></table></div>
+      </section>
+    </section>
+
+    <section id="requestsView" class="view hidden">
+      <section class="panel">
+        <div class="panel-heading"><div><h2>Borrowing requests</h2><p>Queue follows FIFO — earliest request is served first.</p></div><span class="pill orange-pill" id="queueCountLabel">0 requests</span></div>
+        <div id="requestsList" class="request-list"></div>
+      </section>
+    </section>
+
+    <section id="returnsView" class="view hidden">
+      <section class="panel">
+        <div class="panel-heading"><div><h2>Return history</h2><p>Most recently returned books appear first (Stack / LIFO).</p></div><button class="secondary" id="clearReturns">Clear history</button></div>
+        <div id="returnsList" class="return-history"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop hidden" id="bookModal">
+    <form class="modal" id="bookForm">
+      <button type="button" class="close" id="closeModal">×</button>
+      <div class="eyebrow">CATALOG MANAGEMENT</div><h2>Add a new book</h2><p class="subhead">ISBN is used as the unique book identifier.</p>
+      <label>Book title<input name="title" required placeholder="e.g. The Alchemist"></label>
+      <label>Author<input name="author" required placeholder="e.g. Paulo Coelho"></label>
+      <div class="form-row"><label>ISBN<input name="isbn" required placeholder="9780000000000"></label><label>Subject<input name="subject" required placeholder="Fiction"></label></div>
+      <label>Total copies<input name="copies" type="number" min="1" max="99" value="1" required></label>
+      <div class="modal-actions"><button type="button" class="secondary" id="cancelModal">Cancel</button><button class="primary" type="submit">Save book</button></div>
+      <p class="form-note">Demo data is saved in this browser only. No backend is connected.</p>
+    </form>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
